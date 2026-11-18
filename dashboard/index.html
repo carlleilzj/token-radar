@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by implied launch value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">◉</span>
+      <div>
+        <h1>Token Radar</h1>
+        <p class="tag">Every protocol that records no token yet, ranked by what its launch would be worth — and how to farm it.</p>
+      </div>
+    </div>
+    <p class="meta" id="meta">Loading the sealed snapshot…</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="stats" id="stats" aria-label="Board summary"></section>
+
+  <nav class="tabs" aria-label="Views">
+    <button type="button" id="tab-board" class="tab active" data-tab="board">The board</button>
+    <button type="button" id="tab-live" class="tab" data-tab="live">Already trading</button>
+    <button type="button" id="tab-method" class="tab" data-tab="method">How it works</button>
+  </nav>
+
+  <section id="view-board" class="view">
+    <div class="controls" role="search">
+      <label class="ctl grow">Search
+        <input id="q" type="search" placeholder="Name or slug…" autocomplete="off">
+      </label>
+      <label class="ctl">Category
+        <select id="cat"><option value="all">All categories</option></select>
+      </label>
+      <label class="ctl">Chain
+        <select id="chain"><option value="all">All chains</option></select>
+      </label>
+      <label class="ctl">Sort by
+        <select id="sort">
+          <option value="implied">Implied value</option>
+          <option value="tvl">TVL</option>
+          <option value="growth">7-day change</option>
+          <option value="age">Age</option>
+          <option value="name">Name</option>
+        </select>
+      </label>
+      <label class="ctl check"><input id="watchonly" type="checkbox"> Watchlist only</label>
+    </div>
+    <p class="count" id="count"></p>
+    <div class="tablewrap">
+      <table id="board">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th>Protocol</th>
+            <th>Category</th>
+            <th>Chains</th>
+            <th class="num">TVL</th>
+            <th class="num">7d</th>
+            <th class="num">Age</th>
+            <th class="num">Implied value</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="empty" id="empty" hidden>No protocol matches that filter. <button type="button" id="clear" class="linkbtn">Clear filters</button></p>
+  </section>
+
+  <section id="view-live" class="view" hidden>
+    <h2>Already trading — kept apart, never ranked</h2>
+    <p class="lede">These protocols record a token that already trades, so the board shows the market's own value for them instead of a model's. They are the comparables the board's pricing multiple is built from.</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Protocol</th><th>Category</th><th class="num">TVL</th><th class="num">Market cap</th><th class="num">Mcap / TVL</th><th class="num">7d</th></tr>
+        </thead>
+        <tbody id="live-rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="view-method" class="view" hidden>
+    <h2>How the radar scores a protocol</h2>
+    <div class="method">
+      <p>One function scores every row. Nothing is hand-picked and no protocol name is special-cased.</p>
+      <pre class="formula">implied value = TVL × category multiple × growth × maturity × chains
+  category multiple = median mcap/TVL of the category's protocols
+                        whose token already trades (≥3 of them,
+                        else the global median), clamped to 0.05–0.80
+  growth            = 1 + clamp(7d change, −60%, +120%) / 100 × 0.5
+  maturity          = 0.6 + min(age in days, 1095) / 1095 × 0.4
+  chains            = 1 + 0.02 × min(chains − 1, 5)</pre>
+      <h3>What the board never ranks</h3>
+      <ul id="set-aside"></ul>
+      <p>Centralised exchanges, bridges, liquid-staking and restaking products, versioned pools and exchange products cannot be farmed for a launch of their own, so they are set aside and counted here instead of ranked.</p>
+      <h3>Read it honestly</h3>
+      <p>The snapshot is DefiLlama's record, not proof: a protocol on this board <em>records</em> no token, which is not the same as having none. An implied value is this entry's own claim about what a token would be worth if the protocol's record stayed as it is. It does not predict whether or when a token is issued.</p>
+      <p class="fine" id="provenance"></p>
+    </div>
+  </section>
+</main>
+
+<aside id="detail" class="drawer" aria-label="Protocol detail" hidden>
+  <button type="button" id="detail-close" class="drawer-close" aria-label="Close detail">×</button>
+  <div id="detail-body"></div>
+</aside>
+
+<footer class="wrap foot">
+  <p>Token Radar · model <span id="model-ver"></span> · data: sealed DefiLlama snapshot, <span id="as-of"></span>. No network: this page renders from its own files alone.</p>
+</footer>
+
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
